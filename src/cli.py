@@ -4,6 +4,21 @@ import src.main
 
 @click.command()
 @click.option(
+    '-i', '--input', 
+    type=click.File('r'), 
+    required=True
+)
+@click.option(
+    '-c', '--cn-profiles-path',
+    type=click.File('r'),
+    required=True
+)
+@click.option(
+    '-o', '--output',
+    type=click.File('w'),
+    required=True
+)
+@click.option(
     '-m', '--model',
     default='simple',
     help='one of [simple]'
@@ -22,21 +37,6 @@ import src.main
     '-s', '--seed',
     default=1,
     help='Seed for random functions'
-)
-@click.argument(
-    'data', 
-    type=click.File('r'), 
-    required=True
-)
-@click.argument(
-    'cn-profiles',
-    type=click.File('r'),
-    required=True
-)
-@click.argument(
-    'output',
-    type=click.File('w'),
-    required=True
 )
 def run(*kwargs)
     """ Fit LiquidBayes model to data.

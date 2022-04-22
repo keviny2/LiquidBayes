@@ -5,13 +5,13 @@ import numpyro
 from inference import run_inference
 
 
-def run(model, num_samples, num_warmup, seed, data, cn_profiles, output):
+def run(input, cn_profiles_path, output, model, num_samples, num_warmup, seed):
     # load data and cn_profiles
-    data_np = np.genfromtxt(data, delimiter='\t')[:, -1]
-    cn_profiles_np = np.genfromtxt(cn_profiles, delimiter=',')
+    data = np.genfromtxt(input, delimiter='\t')[:, -1]
+    cn_profiles = np.genfromtxt(cn_profiles_path, delimiter=',')
     sampler_obj = run_inference(model,
-                                data_np.squeeze(),
-                                cn_profiles_np.squeeze(),
+                                data.squeeze(),
+                                cn_profiles.squeeze(),
                                 num_samples,
                                 num_warmup,
                                 int(seed))
