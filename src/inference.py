@@ -4,7 +4,7 @@ import numpyro
 from jax import random
 import torch
 
-from models import simple_model, one_additional_clone
+from src.models import simple_model, one_additional_clone
 
 
 def run_inference(model_type, data, cn_profiles, num_samples, num_warmup, iteration, target_accept_prob=0.95):
