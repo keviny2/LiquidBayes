@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import numpyro
 
-from inference import run_inference
+from src.inference import run_inference
 
 
 def run(input, cn_profiles_path, output, model, num_samples, num_warmup, seed):
