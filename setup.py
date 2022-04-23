@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'liquid-bayes=src.cli:main',
+            'liquid-bayes=src.cli:run',
         ]
     }
 )
