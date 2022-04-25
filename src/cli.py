@@ -2,7 +2,7 @@ import click
 
 import src.main
 
-@click.command()
+@click.command(name='run')
 @click.option(
     '-i', '--input', 
     type=click.File('r'), 
