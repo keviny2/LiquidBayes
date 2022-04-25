@@ -42,3 +42,9 @@ def run(*kwargs):
     """ Fit LiquidBayes model to data.
     """
     src.main.run(**kwargs)
+
+@click.group(name='liquid-bayes')
+def main():
+    pass
+
+main.add_command(run)
