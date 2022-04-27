@@ -38,7 +38,7 @@ import src.main
     default=1,
     help='Seed for random functions'
 )
-def run(*kwargs):
+def run(**kwargs):
     """ Fit LiquidBayes model to data.
     """
     src.main.run(**kwargs)
