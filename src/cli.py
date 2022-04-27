@@ -20,8 +20,8 @@ import src.main
 )
 @click.option(
     '-m', '--model',
-    default='simple',
-    help='one of [simple]'
+    default='simple-model',
+    help='one of [simple-model]'
 )
 @click.option(
     '-n', '--num-samples',

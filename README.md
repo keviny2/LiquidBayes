@@ -1,2 +1,2 @@
-# LiquidBayes
-Bayesian Model for Monitoring Cancer Progression Using Liquid Biopsies
+# Overview
+LiquidBayes is a Bayesian Network (BN) for inferring clonal prevalences from liquid biopsy sequencing data
