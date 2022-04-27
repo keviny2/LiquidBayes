@@ -4,7 +4,7 @@ import src.main
 
 @click.command(name='run')
 @click.option(
-    '-i', '--input', 
+    '-i', '--input-path', 
     type=click.File('r'), 
     required=True
 )

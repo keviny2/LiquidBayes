@@ -5,9 +5,9 @@ import numpyro
 from src.inference import run_inference
 
 
-def run(input, cn_profiles_path, output, model, num_samples, num_warmup, seed):
+def run(input_path, cn_profiles_path, output, model, num_samples, num_warmup, seed):
     # load data and cn_profiles
-    data = np.genfromtxt(input, delimiter='\t')[:, -1]
+    data = np.genfromtxt(input_path, delimiter='\t')[:, -1]
     cn_profiles = np.genfromtxt(cn_profiles_path, delimiter=',')
     sampler_obj = run_inference(model,
                                 data.squeeze(),
