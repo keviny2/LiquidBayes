@@ -8,7 +8,7 @@ from src.inference import run_inference
 def run(input_path, cn_profiles_path, output, model, num_samples, num_warmup, seed):
     # load data and cn_profiles
     data = np.genfromtxt(input_path, delimiter='\t')[:, -1]
-    cn_profiles = np.genfromtxt(cn_profiles_path, delimiter=',')
+    cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')[:, 3:]  # do not need genomic locations from bed file
     sampler_obj = run_inference(model,
                                 data.squeeze(),
                                 cn_profiles.squeeze(),

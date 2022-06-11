@@ -1,13 +1,11 @@
 import os
 import pyro
-import pyro.distributions as pydist
+import pyro.distributions as numdist
 import numpyro
 import numpyro.distributions as numdist
 import numpy as np
 import jax.numpy as jnp
 import torch
-
-# from distributions import UniformDiscrete
 
 
 # model definitions
@@ -18,31 +16,35 @@ def simple_model(data, cn_profiles, num_clones):
     :param cn_profiles: (n, num_clones) numpy array
     :param num_clones: integer
     """
-    omega = numpyro.sample('omega', numdist.Gamma(0.5, 0.001))
+    omega = numpyro.sample('omega', numdist.Gamma(1, 1))
     tau = numpyro.sample('tau', numdist.Gamma(1, 1))
+    delta = numpyro.sample('delta', numdist.Normal(0, 1))
 
     probs = np.ones(num_clones) / np.sum(np.ones(num_clones))
-    rho = numpyro.sample('rho', numdist.Dirichlet(probs))
+    rho = numpyro.sample('rho', numdist.Dirichlet(probs, validate_args=False))
 
-    mu = omega * np.sum(cn_profiles * rho, axis=1)
+    mu = omega * np.sum(cn_profiles * rho, axis=1) + delta
 
     with numpyro.plate('data', size=len(data)):
         numpyro.sample('obs', numdist.StudentT(df=100, loc=mu, scale=tau), obs=data)
 
 def one_additional_clone(data, cn_profiles, num_clones):
-    omega = pyro.sample('omega', pydist.Gamma(0.5, 0.001))
-    tau = pyro.sample('tau', pydist.Gamma(1, 1))
+    omega = numpyro.sample('omega', numdist.Gamma(0.5, 0.001))
+    tau = numpyro.sample('tau', numdist.Gamma(1, 1))
   
-    probs = torch.ones(num_clones + 1) / (num_clones + 1)  # add additional clone cluster
-    print(probs)
-    rho = pyro.sample('rho', pydist.Dirichlet(probs))
+    probs = np.ones(num_clones + 1) / (num_clones + 1)  # add additional clone cluster
+    rho = numpyro.sample('rho', numdist.Dirichlet(probs))
 
-    with pyro.plate('new clone', size=len(data)):
-        new_clone_cn_profile = pyro.sample('new cn profile',
-                                           UniformDiscrete(torch.FloatTensor([1,2,3,4,5,6,7,8,9]), torch.ones(9)/9))
+    with numpyro.plate('new clone', size=len(data)):
+        new_clone_cn_profile = numpyro.sample('new cn profile',
+                                              numdist.DiscreteUniform(1,9),
+                                              infer={"enumerate": "parallel"})
 
-    mu = omega * torch.sum(torch.cat((cn_profiles, new_clone_cn_profile[:, None]), dim=1) * rho,
-                           dim=1)
+    print('cn_profiles.shape:\n', cn_profiles.shape)
+    print('cn_profiles:\n', cn_profiles)
+    print('new_clone_cn_profile.shape:\n', new_clone_cn_profile.shape)
+    print('new_clone_cn_profile:\n', new_clone_cn_profile)
+    mu = omega * np.sum(np.concatenate((cn_profiles, new_clone_cn_profile[:, None]), axis=1) * rho, axis=1)
 
-    with pyro.plate('data', size=len(data)):
-        pyro.sample('obs', pydist.StudentT(df=10, loc=mu, scale=tau), obs=data)
+    with numpyro.plate('data', size=len(data)):
+        numpyro.sample('obs', numdist.StudentT(df=10, loc=mu, scale=tau), obs=data)
