@@ -21,7 +21,7 @@ import src.main
 @click.option(
     '-m', '--model',
     default='simple-model',
-    help='one of [simple-model, one-additional-clone]'
+    help='One of [simple-model, version-2, one-additional-clone]'
 )
 @click.option(
     '-n', '--num-samples',
@@ -37,6 +37,11 @@ import src.main
     '-s', '--seed',
     default=1,
     help='Seed for random functions'
+)
+@click.option(
+    '--progress-bar',
+    default=False,
+    help='Show progress bar during inference'
 )
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
