@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import torch
 import pyro
 from pyro.infer import SVI, Trace_ELBO, Predictive, TraceMeanField_ELBO
@@ -26,17 +27,22 @@ def run_inference(model,
                                          progress_bar=progress_bar)
         sampler_obj.run(random.PRNGKey(iteration), data, cn_profiles, cn_profiles.shape[1])
 
+    if model in ['version-2-mcmc']:
+        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
+                                         num_warmup=num_warmup,
+                                         num_samples=num_samples,
+                                         progress_bar=progress_bar)
+
+        sampler_obj.run(random.PRNGKey(iteration),
+                        data,
+                        cn_profiles,
+                        cn_profiles.shape[1],
+                        int(np.amax(cn_profiles.flatten())))
+
     if model in ['version-2-pymc']:
         sampler_obj = version_2_pymc(data, cn_profiles, num_clones, num_samples)
 
-    if model in ['version-2-mcmc']:
-        sampler_obj = pyro.infer.MCMC(pyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
-                                      warmup_steps=num_warmup,
-                                      num_samples=num_samples,
-                                      disable_progbar=not progress_bar)
-        sampler_obj.run(torch.from_numpy(data), torch.from_numpy(cn_profiles), cn_profiles.shape[1])
-
-    # BUG: version-2-vi still not working
+    # BUG: version-2-vi not working
     if model in ['version-2-vi']:
         sampler_obj = SVI(version_2,
                           version_2_guide,
