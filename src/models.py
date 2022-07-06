@@ -36,9 +36,8 @@ def ichor(data, cn_profiles, num_clones):
     :param cn_profiles: (n, num_clones) numpy array
     :param num_clones: integer
     """
-    b = numpyro.sample('b', numdist.Uniform(1, 6))
     rho = numpyro.sample('rho', numdist.Dirichlet(jnp.ones(num_clones)))
-    mu = jnp.log(jnp.sum(cn_profiles*rho, axis=1)) - jnp.log(rho[-1]*cn_profiles[:, -1] + (1 - rho[-1]) * b)
+    mu = jnp.log(jnp.sum(cn_profiles*rho, axis=1)) - jnp.log(jnp.mean(jnp.sum(cn_profiles*rho, axis=1)))
     tau = numpyro.sample('tau', numdist.InverseGamma(1, 1))
     with numpyro.plate('data', size=len(data)):
         numpyro.sample('obs', numdist.StudentT(df=4, loc=mu, scale=tau), obs=data)
