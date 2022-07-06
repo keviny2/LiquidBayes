@@ -8,7 +8,7 @@ import numpyro
 from jax import random
 from tqdm import trange
 
-from src.models import simple_model, one_additional_clone, version_2, version_2_guide, version_2_mcmc, version_2_pymc
+from src.models import simple_model, version_2, version_2_guide, version_2_mcmc, ichor
 
 
 def run_inference(model,
@@ -20,27 +20,12 @@ def run_inference(model,
                   progress_bar,
                   target_accept_prob=0.95):
 
-    if model in ['simple-model']:
+    if model in ['simple-model', 'ichor', 'version-2-mcmc']:
         sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
                                          num_warmup=num_warmup,
                                          num_samples=num_samples,
                                          progress_bar=progress_bar)
         sampler_obj.run(random.PRNGKey(iteration), data, cn_profiles, cn_profiles.shape[1])
-
-    if model in ['version-2-mcmc']:
-        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
-                                         num_warmup=num_warmup,
-                                         num_samples=num_samples,
-                                         progress_bar=progress_bar)
-
-        sampler_obj.run(random.PRNGKey(iteration),
-                        data,
-                        cn_profiles,
-                        cn_profiles.shape[1],
-                        int(np.amax(cn_profiles.flatten())))
-
-    if model in ['version-2-pymc']:
-        sampler_obj = version_2_pymc(data, cn_profiles, num_clones, num_samples)
 
     # BUG: version-2-vi not working
     if model in ['version-2-vi']:

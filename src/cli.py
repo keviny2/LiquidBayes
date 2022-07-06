@@ -21,7 +21,7 @@ import src.main
 @click.option(
     '-m', '--model',
     default='simple-model',
-    help='One of [simple-model, version-2, one-additional-clone]'
+    help='One of [simple-model, version-2, ichor]'
 )
 @click.option(
     '-n', '--num-samples',
