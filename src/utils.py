@@ -14,7 +14,7 @@ def save_results(path, sampler_obj, num_subclones):
     samples = pd.DataFrame.from_dict(sampler_obj.get_samples())  # get samples from inference
     clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
     rhos = pd.DataFrame(samples['rho'].to_list(), columns=clones, dtype=float) 
-    samples.join(rhos).drop('rho', axis=1).describe().loc[['mean']].to_csv(path)  # write mean of each sample site to csv file
+    samples.join(rhos).drop('rho', axis=1).describe().loc[['mean']].to_csv(path, index=False)  # write mean of each sample site to csv file
 
 def remove_outliers(cn_config, data, cn_profiles, indices, vals):
     """

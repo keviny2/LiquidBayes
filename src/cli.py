@@ -20,8 +20,8 @@ import src.main
 )
 @click.option(
     '-m', '--model',
-    default='simple-model',
-    help='One of [simple-model, version-2, ichor]'
+    default='simple',
+    help='One of [simple]'
 )
 @click.option(
     '-n', '--num-samples',
@@ -42,6 +42,11 @@ import src.main
     '--progress-bar',
     default=False,
     help='Show progress bar during inference'
+)
+@click.option(
+    '--preprocess',
+    default=True,
+    help='Preprocess data by removing outliers within CN configurations'
 )
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
