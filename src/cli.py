@@ -6,17 +6,20 @@ import src.main
 @click.option(
     '-i', '--input-path', 
     type=click.File('r'), 
-    required=True
+    required=True,
+    help='Path to input .bam or .bed file'
 )
 @click.option(
     '-c', '--cn-profiles-path',
     type=click.File('r'),
-    required=True
+    required=True,
+    help='Path to input .bed file with the copy-number profiles for each clone'
 )
 @click.option(
     '-o', '--output',
     type=click.File('w'),
-    required=True
+    required=True,
+    help='Path to where the output is written to'
 )
 @click.option(
     '-m', '--model',
