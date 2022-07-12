@@ -1,64 +1,36 @@
 import numpy as np
 import pandas as pd
 import string
-from collections import defaultdict
-from sklearn.mixture import GaussianMixture
+import random
+import rpy2.robjects.packages as rpackages
+from rpy2.robjects.vectors import StrVector
 
 
 def load_data(data_path, cn_profiles_path):
     data = np.genfromtxt(data_path, delimiter='\t')[:, -1]
-    cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')[:, 3:]  # do not need genomic locations from bed file
+    cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')[:, 3:]  # do not need genomic locations
     return data, cn_profiles
 
 def save_results(path, sampler_obj, num_subclones):
     samples = pd.DataFrame.from_dict(sampler_obj.get_samples())  # get samples from inference
     clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
-    rhos = pd.DataFrame(samples['rho'].to_list(), columns=clones, dtype=float) 
+    rhos = pd.DataFrame(samples['rho'].to_list(), columns=clones, dtype=float)
     samples.join(rhos).drop('rho', axis=1).describe().loc[['mean']].to_csv(path, index=False)  # write mean of each sample site to csv file
 
-def remove_outliers(cn_config, data, cn_profiles, indices, vals):
+def get_random_string(length=10):
     """
-    given a CN configuration and dataset, remove values at indices which correspond to outliers
-    Arguments:
-        cn_config: tuple
-        data: ndarray
-        cn_profiles: ndarray
-    Returns:
-        dataset with outliers removed
+    generate a random string; used to define unique file paths if running LiquidBayes in parallel
     """
-        
-    # fit gmm
-    X = np.array(vals[cn_config]).reshape(-1, 1)
-    gmm = GaussianMixture(n_components=2).fit(X)  # fit gmm
-    labels = gmm.predict(X)  # get assignments for each observation
-    
-    if gmm.covariances_[0].squeeze() < gmm.covariances_[1].squeeze():
-        labels = np.invert(labels.astype(bool))
-    
-    # remove outliers from data.obs
-    outlier_idxs = np.array(indices[cn_config]).reshape(-1,1)[labels == 0]
-    
-    # set the outliers as nans and remove afterwards
-    data[outlier_idxs] = np.nan
-    cn_profiles[outlier_idxs] = np.nan
-    
-def preprocess_data(data, cn_profiles):
 
-    # create dictionaries storing info for each CN configuration
-    indices = defaultdict(list)
-    vals = defaultdict(list)
-    for n in range(len(data)):
-        indices[tuple(cn_profiles[n])].append(n)  # append the index to data.obs
-        vals[tuple(cn_profiles[n])].append(data[n])
-        
-    # remove outliers from each CN configuration
-    for cn_config in list(vals.keys()):
-        if len(vals[cn_config]) < 50:
-            continue
-        remove_outliers(cn_config, data, cn_profiles, indices, vals)
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
-    nan_idxs = ~np.isnan(data)
-    data = data[nan_idxs]
-    cn_profiles = cn_profiles[nan_idxs, :]
+def import_R_pkgs(packnames):
+    utils = rpackages.importr('utils')
+    names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+    if len(names_to_install) > 0:
+        utils.install_packages(StrVector(names_to_install))
 
-    return data, cn_profiles
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')

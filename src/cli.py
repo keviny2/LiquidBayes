@@ -5,13 +5,11 @@ import src.main
 @click.command(name='run')
 @click.option(
     '-i', '--input-path', 
-    type=click.File('r'), 
     required=True,
     help='Path to input .bam or .bed file'
 )
 @click.option(
     '-c', '--cn-profiles-path',
-    type=click.File('r'),
     required=True,
     help='Path to input .bed file with the copy-number profiles for each clone'
 )
@@ -50,6 +48,27 @@ import src.main
     '--preprocess',
     default=True,
     help='Preprocess data by removing outliers within CN configurations'
+)
+@click.option(
+    '--chrs',
+    type=click.STRING,
+    default='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22',
+    help='Chromosomes present in bam file'
+)
+@click.option(
+    '--bin-size',
+    default=500000,
+    help='Bin size for computing read counts'
+)
+@click.option(
+    '--qual',
+    default=20,
+    help='Specify the mapping quality value below which reads are ignored'
+)
+@click.option(
+    '--verbose',
+    default=False,
+    help='Allow printing'
 )
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
