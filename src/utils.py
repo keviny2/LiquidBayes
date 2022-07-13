@@ -1,9 +1,9 @@
+import os
+import sys
 import numpy as np
 import pandas as pd
 import string
 import random
-import rpy2.robjects.packages as rpackages
-from rpy2.robjects.vectors import StrVector
 
 
 def load_data(data_path, cn_profiles_path):
@@ -19,18 +19,19 @@ def save_results(path, sampler_obj, num_subclones):
 
 def get_random_string(length=10):
     """
-    generate a random string; used to define unique file paths if running LiquidBayes in parallel
+    generate a random string - used to define unique file paths if running LiquidBayes in parallel
     """
 
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
-def import_R_pkgs(packnames):
-    utils = rpackages.importr('utils')
-    names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
-    if len(names_to_install) > 0:
-        utils.install_packages(StrVector(names_to_install))
-
+def get_path_to(relative_path, path_to_file=__file__):
+    """
+    this function covers the case when LiquidBayes is executed from another directory, but still need to get paths to directories within LiquidBayes
+    """
+    dir_path = os.path.dirname(os.path.realpath(path_to_file))
+    return os.path.join(dir_path, '..', relative_path)
+    
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')

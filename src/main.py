@@ -1,5 +1,5 @@
 from src.inference import run_inference
-from src.preprocessing import preprocess_from_cn_configs, get_reads, preprocess_bam_file
+from src.preprocessing import preprocess_cn_configs, get_reads, preprocess_bam_file
 from src.utils import load_data, save_results, blockPrint
 
 
@@ -28,7 +28,7 @@ def run(input_path,
         raw_data, raw_cn_profiles = load_data(input_path, cn_profiles_path)
 
     if preprocess:
-        data, cn_profiles = preprocess_from_cn_configs(raw_data, raw_cn_profiles)
+        data, cn_profiles = preprocess_cn_configs(raw_data, raw_cn_profiles)
     else:
         data, cn_profiles = raw_data, raw_cn_profiles
 

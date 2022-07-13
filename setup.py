@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='LiquidBayes',
-    version='0.4',
+    version='0.5',
     description='LiquidBayes is a Bayesian Network (BN) for inferring clonal prevalences from liquid biopsy sequencing data',
     author='Kevin Yang',
     author_email='kevinyang10@gmail.com',

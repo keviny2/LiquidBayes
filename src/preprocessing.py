@@ -1,81 +1,81 @@
 import os
 import subprocess
+import numpy as np
 import pandas as pd
 import pysam
 from collections import defaultdict
 from sklearn.mixture import GaussianMixture
+import pyranges as pr
+
 from rpy2 import robjects
-import pybedtools as pbt
+from rpy2.robjects.packages import importr
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+# only display errors, suppress warning messages
+from rpy2.rinterface_lib.callbacks import logger
+import logging
+logger.setLevel(logging.ERROR)
 
-from src.utils import import_R_pkgs, get_random_string
+from src.utils import get_random_string, get_path_to
 
 
-def get_reads(bam_file_path, chrs, qual):
+
+def get_reads(bam_file_path, chrs, bin_size, qual):
     if not os.path.exists(bam_file_path + '.bai'):
         print('Indexing {}'.format(bam_file_path))
         pysam.index(bam_file_path)
 
-    # TODO: might want to modify so that output_file_path isn't hard coded
-    readcount_path = 'extdata/temp/readcounts.wig' + get_random_string()
-    subprocess.run(['../hmmcopy_utils/bin/readCounter',
-                    '-c', chrs,
-                    '-w', bin_size,
-                    '-q', qual,
-                    '>', readcount_path],
-                    shell=True,
-                    check=True)
+    readcount_path = get_path_to(f'extdata/temp/readcounts{get_random_string()}.wig')
+    command = f"{get_path_to('hmmcopy_utils/bin/readCounter')} {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
+    subprocess.run(command, shell=True, check=True)
     return readcount_path
 
 def correct_reads(readcount_path):
-    import_R_pkgs(('HMMcopy', 'dplyr'))
-    data_full_path = 'extdata/temp/data_full.bed' + get_random_string()
-    # TODO: figure out a way to have gc and map wig files not be hard coded?
-    robjects.r('''
-            copy <- wigsToRangedData(readcount_path, extdata/ref/b37.gc.wig, extdata/ref/b37.map.wig)
-            normal_copy <- correctReadcount(copy)
-            normal_copy <- normal_copy %>% dplyr::select(chr, start, end, copy)
-            normal_copy$chr <- normal_copy$chr %>% as.numeric() %>% sort()
-            write.table(normal_copy, {}, sep='\t', col.names = FALSE, row.names = FALSE)
-            '''.format(data_full_path))
-    return data_full_path
+    data_full_path = get_path_to(f'extdata/temp/data_full{get_random_string()}.bed')
 
-def intersect(data_full_path, cn_profiles_path):
-    # define temporary files
-    temp_data = 'extdata/temp/temp_data' + get_random_string() + '.bed'
-    temp_cn = 'extdata/temp/temp_cn' + get_random_string() + '.bed'
+    hmmcopy = importr('HMMcopy')
+    data = hmmcopy.wigsToRangedData(readcount_path, 
+                                    get_path_to('extdata/ref/b37.gc.wig'),
+                                    get_path_to('extdata/ref/b37.map.wig'))
+    data = hmmcopy.correctReadcount(data)
 
-    pbt.BedTool(data_full_path).intersect(cn_profiles_path).saveas(temp_data)
-    pbt.BedTool(cn_profiles_path).intersect(data_full_path).saveas(temp_cn)
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        corrected_readcounts = robjects.conversion.rpy2py(data)[['chr', 'start', 'end', 'copy']]
+    return corrected_readcounts
 
-    bed = pd.read_csv(temp_data, sep='\t', header=None)
-    cn_bed = pd.read_csv(temp_cn, sep='\t', header=None)
+def intersect(corrected_readcounts, cn_profiles_path):
+    cn_profiles = pd.read_csv(cn_profiles_path, sep='\t', header=None)
 
-    df = pd.concat([bed, cn_bed], axis=1)
-    df = df.dropna()
+    # format column names for PyRanges
+    corrected_readcounts.rename(columns={'chr': 'Chromosome', 'start': 'Start', 'end': 'End'}, inplace=True)
+    cn_profiles.columns = [str(num) for num in range(cn_profiles.shape[1])]
+    cn_profiles.rename(columns={'0': 'Chromosome', '1': 'Start', '2': 'End'}, inplace=True)
 
-    # remove unnecessary files
-    os.remove(temp_data)
-    os.remove(temp_cn)
+    # intersect both ways
+    corrected_readcounts_gr, cn_profiles_gr = pr.PyRanges(corrected_readcounts).sort(), pr.PyRanges(cn_profiles).sort()
+    gr1 = corrected_readcounts_gr.intersect(cn_profiles_gr)
+    gr2 = cn_profiles_gr.intersect(corrected_readcounts_gr)
 
-    return df.iloc[:, :4], df.iloc[:, 4:]
+    corrected_readcounts_intersected = pd.concat([gr1.df.astype({'Chromosome': int}), gr2.df.astype({'Chromosome': int})], axis=1).dropna()
+    return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
 
 def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual):
     print('Getting readcounts')
-    readcount_path = get_reads(bam_file_path, chrs, qual)
+    readcount_path = get_reads(bam_file_path, chrs, bin_size, qual)
 
     print('Correcting readcounts')
-    data_full_path = correct_reads(readcount_path)
+    readcount_path = get_path_to(readcount_path)
+    corrected_readcounts = correct_reads(readcount_path)
 
     print('Intersecting readcounts with CN profiles')
-    data, cn_profiles = intersect(data_full_path, cn_profiles_path)
+    data, cn_profiles = intersect(corrected_readcounts, cn_profiles_path)
 
-    # remove unnecessary files
+    # remove unnecessary file
     os.remove(readcount_path)
-    os.remove(data_full_path)
 
     return data, cn_profiles
     
-def preprocess_from_cn_configs(data, cn_profiles):
+def preprocess_cn_configs(data, cn_profiles):
 
     def remove_outliers(cn_config, data, cn_profiles, indices, vals):
         """
