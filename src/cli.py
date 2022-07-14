@@ -17,7 +17,7 @@ import src.main
 )
 @click.option(
     '-o', '--output',
-    type=click.File('w'),
+    type=click.STRING,
     required=True,
     help='Path to where the output is written to'
 )
