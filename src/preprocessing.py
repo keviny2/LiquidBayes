@@ -60,11 +60,11 @@ def intersect(corrected_readcounts, cn_profiles_path):
     return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
 
 def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual):
+    print('Processing .bam file')
     print('Getting readcounts')
     readcount_path = get_reads(bam_file_path, chrs, bin_size, qual)
 
     print('Correcting readcounts')
-    readcount_path = get_path_to(readcount_path)
     corrected_readcounts = correct_reads(readcount_path)
 
     print('Intersecting readcounts with CN profiles')
@@ -76,6 +76,7 @@ def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual):
     return data, cn_profiles
     
 def preprocess_cn_configs(data, cn_profiles):
+    print('Preprocessing within copy number configurations')
 
     def remove_outliers(cn_config, data, cn_profiles, indices, vals):
         """

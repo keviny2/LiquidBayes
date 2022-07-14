@@ -21,10 +21,8 @@ def run(input_path,
         blockPrint()
 
     if input_path.endswith('.bam'):
-        print('Processing .bam file')
         raw_data, raw_cn_profiles = preprocess_bam_file(input_path, cn_profiles_path, chrs, bin_size, qual)
     elif input_path.endswith('.bed'):
-        print('Processing .bed file')
         raw_data, raw_cn_profiles = load_data(input_path, cn_profiles_path)
 
     if preprocess:

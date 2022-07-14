@@ -7,11 +7,13 @@ import random
 
 
 def load_data(data_path, cn_profiles_path):
+    print('Processing .bed file')
     data = np.genfromtxt(data_path, delimiter='\t')[:, -1]
     cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')[:, 3:]  # do not need genomic locations
     return data, cn_profiles
 
 def save_results(path, sampler_obj, num_subclones):
+    print('Saving results')
     samples = pd.DataFrame.from_dict(sampler_obj.get_samples())  # get samples from inference
     clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
     rhos = pd.DataFrame(samples['rho'].to_list(), columns=clones, dtype=float)

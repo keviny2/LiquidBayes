@@ -15,6 +15,7 @@ def run_inference(model,
                   progress_bar,
                   target_accept_prob=0.95):
 
+    print('Performing inference using {} model'.format(model))
     if model in ['simple']:
         sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
                                          num_warmup=num_warmup,
