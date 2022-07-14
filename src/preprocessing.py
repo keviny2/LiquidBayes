@@ -31,8 +31,6 @@ def get_reads(bam_file_path, chrs, bin_size, qual):
     return readcount_path
 
 def correct_reads(readcount_path):
-    data_full_path = get_path_to(f'extdata/temp/data_full{get_random_string()}.bed')
-
     hmmcopy = importr('HMMcopy')
     data = hmmcopy.wigsToRangedData(readcount_path, 
                                     get_path_to('extdata/ref/b37.gc.wig'),

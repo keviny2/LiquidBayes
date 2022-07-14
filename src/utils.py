@@ -41,7 +41,7 @@ def get_path_to(relative_path, path_to_file=__file__):
     this function covers the case when LiquidBayes is executed from another directory, but still need to get paths to directories within LiquidBayes
     """
     dir_path = os.path.dirname(os.path.realpath(path_to_file))
-    return os.path.join(dir_path, relative_path)
+    return os.path.join(dir_path, '..', relative_path)
     
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
