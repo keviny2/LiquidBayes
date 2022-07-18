@@ -26,7 +26,7 @@ def get_reads(bam_file_path, chrs, bin_size, qual):
         pysam.index(bam_file_path)
 
     readcount_path = f'temp/readcounts{get_random_string()}.wig'
-    command = f"readCounter {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
+    command = f"mkdir temp/ && readCounter {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
     subprocess.run(command, shell=True, check=True)
     return readcount_path
 
