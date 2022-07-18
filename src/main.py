@@ -4,6 +4,8 @@ from src.utils import load_data, save_results, blockPrint
 
 
 def run(input_path,
+        gc,
+        mapp,
         cn_profiles_path,
         output,
         model,
@@ -16,12 +18,11 @@ def run(input_path,
         bin_size,
         qual,
         verbose):
-
     if not verbose:
         blockPrint()
 
     if input_path.endswith('.bam'):
-        raw_data, raw_cn_profiles = preprocess_bam_file(input_path, cn_profiles_path, chrs, bin_size, qual)
+        raw_data, raw_cn_profiles = preprocess_bam_file(input_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp)
     elif input_path.endswith('.bed'):
         raw_data, raw_cn_profiles = load_data(input_path, cn_profiles_path)
 

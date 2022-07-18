@@ -13,9 +13,16 @@ def load_data(data_path, cn_profiles_path):
     return data, cn_profiles
 
 def save_results(path, sampler_obj, num_subclones):
-    samples = pd.DataFrame.from_dict(sampler_obj.get_samples())  # get samples from inference
-    clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
-    rhos = pd.DataFrame(samples['rho'].to_list(), columns=clones, dtype=float)
+    #dct = sampler_obj.get_samples()
+    #print(len(dct))
+    #dct = {k:np.asarray(v) for k,v in dct.items()}
+    #data = np.array(list(dct.items()), dtype=object)
+    #np.save('./result.npy', data)
+    dct = sampler_obj.get_samples()
+    clones = list(string.ascii_uppercase)[:2] + ['normal']
+    rhos = pd.DataFrame(list(dct['rho']),columns=clones, dtype = float)
+    dct.pop('rho')
+    samples = pd.DataFrame.from_dict(dct)  # get samples from inference
 
     res_dir = os.path.dirname(path)
     if not os.path.exists(res_dir):
@@ -25,7 +32,7 @@ def save_results(path, sampler_obj, num_subclones):
         os.remove(path)
 
     print('Saving results')
-    samples.join(rhos).drop('rho', axis=1).describe().loc[['mean']].to_csv(path, index=False)  # write mean of each sample site to csv file
+    samples.join(rhos).describe().loc[['mean']].to_csv(path, index=False)  # write mean of each sample site to csv file
 
 def get_random_string(length=10):
     """
@@ -36,12 +43,5 @@ def get_random_string(length=10):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
-def get_path_to(relative_path, path_to_file=__file__):
-    """
-    this function covers the case when LiquidBayes is executed from another directory, but still need to get paths to directories within LiquidBayes
-    """
-    dir_path = os.path.dirname(os.path.realpath(path_to_file))
-    return os.path.join(dir_path, '..', relative_path)
-    
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')

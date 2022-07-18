@@ -16,7 +16,7 @@ from rpy2.rinterface_lib.callbacks import logger
 import logging
 logger.setLevel(logging.ERROR)
 
-from src.utils import get_random_string, get_path_to
+from src.utils import get_random_string 
 
 
 
@@ -25,16 +25,16 @@ def get_reads(bam_file_path, chrs, bin_size, qual):
         print('Indexing {}'.format(bam_file_path))
         pysam.index(bam_file_path)
 
-    readcount_path = get_path_to(f'extdata/temp/readcounts{get_random_string()}.wig')
-    command = f"{get_path_to('hmmcopy_utils/bin/readCounter')} {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
+    readcount_path = f'temp/readcounts{get_random_string()}.wig'
+    command = f"readCounter {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
     subprocess.run(command, shell=True, check=True)
     return readcount_path
 
-def correct_reads(readcount_path):
+def correct_reads(readcount_path, gc_path, map_path):
     hmmcopy = importr('HMMcopy')
     data = hmmcopy.wigsToRangedData(readcount_path, 
-                                    get_path_to('extdata/ref/b37.gc.wig'),
-                                    get_path_to('extdata/ref/b37.map.wig'))
+                                    gc_path,
+                                    map_path)
     data = hmmcopy.correctReadcount(data)
 
     with localconverter(robjects.default_converter + pandas2ri.converter):
@@ -57,15 +57,16 @@ def intersect(corrected_readcounts, cn_profiles_path):
     corrected_readcounts_intersected = pd.concat([gr1.df.astype({'Chromosome': int}), gr2.df.astype({'Chromosome': int})], axis=1).dropna()
     return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
 
-def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual):
+def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp):
     print('Processing .bam file')
     print('Getting readcounts')
     readcount_path = get_reads(bam_file_path, chrs, bin_size, qual)
 
     print('Correcting readcounts')
-    corrected_readcounts = correct_reads(readcount_path)
+    corrected_readcounts = correct_reads(readcount_path, gc, mapp)
 
     print('Intersecting readcounts with CN profiles')
+    print(cn_profiles_path)
     data, cn_profiles = intersect(corrected_readcounts, cn_profiles_path)
 
     # remove unnecessary file

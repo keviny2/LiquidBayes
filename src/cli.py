@@ -10,6 +10,18 @@ import src.main
     help='Path to input .bam or .bed file'
 )
 @click.option(
+    '--gc',
+    type=click.STRING,
+    required=True,
+    help='Path to the gc content wig file'
+)
+@click.option(
+    '--mapp',
+    type=click.STRING,
+    required=True,
+    help='Path to the mappability wig file'
+)
+@click.option(
     '-c', '--cn-profiles-path',
     type=click.STRING,
     required=True,
