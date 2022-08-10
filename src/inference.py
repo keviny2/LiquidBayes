@@ -19,11 +19,6 @@ def run_inference(model,
 
     print('Performing inference using {} model'.format(model))
     if model == 'one-more-clone':
-#        sampler_obj = MCMC(MixedHMC(HMC(eval(model.replace('-', '_')),num_steps=2000, target_accept_prob=target_accept_prob), num_discrete_updates=len(data)),  # convert '-' to '_' to match function name
-#                                         num_warmup=num_warmup,
-#                                         num_samples=num_samples,
-#                                         progress_bar=progress_bar)
-#        sampler_obj.run(random.PRNGKey(iteration), data, cn_profiles, cn_profiles.shape[1])
         r = np.random.RandomState(iteration)
 
         one_addition_model,step = one_more_clone(data, cn_profiles, cn_profiles.shape[1], target_accept_prob)

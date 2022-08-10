@@ -28,19 +28,6 @@ def one_more_clone(data, cn_profiles, num_clones, prob):
     :param num_clones: integer
     :returns: pymc model
     """
-    #rho = numpyro.sample('rho', numdist.Dirichlet(jnp.ones(num_clones + 1)))
-    #with numpyro.plate('additional_clone', size=len(data)):
-    #   new_cn_col = numpyro.sample('new_clone_cn', numdist.DiscreteUniform(low = 1, high = 10))
-    ##new_cn_col = numdist.DiscreteUniform(low=1,high=10).sample(PRNGKey(1),(len(data),1))
-    ##print(new_cn_col.shape)
-    ##print(new_cn_col)
-    ##for line in traceback.format_stack():
-    ##    print(line.strip())
-    #new_cn_profiles = jnp.concatenate((cn_profiles, new_cn_col.reshape([len(data), 1])), axis = 1)
-    #mu = jnp.log(jnp.sum(new_cn_profiles*rho, axis=1)) - jnp.log(jnp.mean(jnp.sum(new_cn_profiles*rho, axis=1)))
-    #tau = numpyro.sample('tau', numdist.InverseGamma(3, 1))
-    #with numpyro.plate('data', size=len(data)):
-    #    numpyro.sample('obs', numdist.StudentT(df=4, loc=mu, scale=tau), obs=data)
     one_addition_model = pm.Model()
 
     with one_addition_model:
