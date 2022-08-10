@@ -1,9 +1,11 @@
 import os
+import aesara.tensor as at
 import numpy as np
 import numpyro
+from numpyro.infer import MCMC, NUTS, HMC, MixedHMC
 from jax import random
-
-from src.models import simple
+import pymc as pm
+from src.models import simple, one_more_clone
 
 
 def run_inference(model,
@@ -16,11 +18,22 @@ def run_inference(model,
                   target_accept_prob=0.95):
 
     print('Performing inference using {} model'.format(model))
-    if model in ['simple']:
-        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
-                                         num_warmup=num_warmup,
-                                         num_samples=num_samples,
-                                         progress_bar=progress_bar)
+    if model == 'one-more-clone':
+#        sampler_obj = MCMC(MixedHMC(HMC(eval(model.replace('-', '_')),num_steps=2000, target_accept_prob=target_accept_prob), num_discrete_updates=len(data)),  # convert '-' to '_' to match function name
+#                                         num_warmup=num_warmup,
+#                                         num_samples=num_samples,
+#                                         progress_bar=progress_bar)
+#        sampler_obj.run(random.PRNGKey(iteration), data, cn_profiles, cn_profiles.shape[1])
+        r = np.random.RandomState(iteration)
+
+        one_addition_model,step = one_more_clone(data, cn_profiles, cn_profiles.shape[1], target_accept_prob)
+        samples = pm.sample(draws=num_samples, tune=num_warmup, step=step, random_seed=r,progressbar=progress_bar, model=one_addition_model)
+        return samples
+    elif model == 'simple':
+        sampler_obj = MCMC(NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),
+                                        num_warmup=num_warmup,
+                                        num_samples=num_samples,
+                                        progress_bar=progress_bar)
         sampler_obj.run(random.PRNGKey(iteration), data, cn_profiles, cn_profiles.shape[1])
 
-    return sampler_obj
+        return sampler_obj

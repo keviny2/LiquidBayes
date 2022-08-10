@@ -37,7 +37,7 @@ import src.main
     '-m', '--model',
     type=click.STRING,
     default='simple',
-    help='One of [simple]'
+    help='One of [simple, one-more-clone]'
 )
 @click.option(
     '-n', '--num-samples',
