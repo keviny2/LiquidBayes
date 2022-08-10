@@ -16,13 +16,13 @@ from rpy2.rinterface_lib.callbacks import logger
 import logging
 logger.setLevel(logging.ERROR)
 
-from src.utils import get_random_string 
+from src.utils import get_random_string, _print
 
 
 
-def get_reads(bam_file_path, chrs, bin_size, qual):
+def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
     if not os.path.exists(bam_file_path + '.bai'):
-        print('Indexing {}'.format(bam_file_path))
+        _print('Indexing {}'.format(bam_file_path), verbose)
         pysam.index(bam_file_path)
 
     readcount_path = f'temp/readcounts{get_random_string()}.wig'
@@ -58,16 +58,15 @@ def intersect(corrected_readcounts, cn_profiles_path):
     corrected_readcounts_intersected = pd.concat([gr1.df.astype({'Chromosome': int}), gr2.df.astype({'Chromosome': int})], axis=1).dropna()
     return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
 
-def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp):
-    print('Processing .bam file')
-    print('Getting readcounts')
-    readcount_path = get_reads(bam_file_path, chrs, bin_size, qual)
+def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose):
+    _print('Processing .bam file', verbose)
+    _print('Getting readcounts', verbose)
+    readcount_path = get_reads(bam_file_path, chrs, bin_size, qual, verbose)
 
-    print('Correcting readcounts')
+    _print('Correcting readcounts', verbose)
     corrected_readcounts = correct_reads(readcount_path, gc, mapp)
 
-    print('Intersecting readcounts with CN profiles')
-    print(cn_profiles_path)
+    _print('Intersecting readcounts with CN profiles', verbose)
     data, cn_profiles = intersect(corrected_readcounts, cn_profiles_path)
 
     # remove unnecessary file
@@ -75,8 +74,8 @@ def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, g
 
     return data, cn_profiles
     
-def preprocess_cn_configs(data, cn_profiles):
-    print('Preprocessing within copy number configurations')
+def preprocess_cn_configs(data, cn_profiles, verbose):
+    _print('Preprocessing within copy number configurations', verbose)
 
     def remove_outliers(cn_config, data, cn_profiles, indices, vals):
         """

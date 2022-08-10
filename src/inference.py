@@ -4,6 +4,7 @@ import numpyro
 from jax import random
 
 from src.models import simple
+from src.utils import _print
 
 
 def run_inference(model,
@@ -13,9 +14,10 @@ def run_inference(model,
                   num_warmup,
                   iteration,
                   progress_bar,
+                  verbose,
                   target_accept_prob=0.95):
 
-    print('Performing inference using {} model'.format(model))
+    _print('Performing inference using {} model'.format(model), verbose)
     if model in ['simple']:
         sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
                                          num_warmup=num_warmup,

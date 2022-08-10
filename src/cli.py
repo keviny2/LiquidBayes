@@ -7,7 +7,7 @@ import src.main
     '-i', '--input-path', 
     type=click.STRING,
     required=True,
-    help='Path to input .bam or .bed file'
+    help='Path to input .bam'
 )
 @click.option(
     '--gc',
@@ -62,12 +62,6 @@ import src.main
     type=click.BOOL,
     default=False,
     help='Show progress bar during inference'
-)
-@click.option(
-    '--preprocess',
-    type=click.BOOL,
-    default=True,
-    help='Preprocess data by removing outliers within CN configurations'
 )
 @click.option(
     '--chrs',
