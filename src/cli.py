@@ -45,7 +45,7 @@ import src.main
     '-m', '--model',
     type=click.STRING,
     default='cn',
-    help='One of [cn]'
+    help='One of [cn, one-more-clone]'
 )
 @click.option(
     '-n', '--num-samples',

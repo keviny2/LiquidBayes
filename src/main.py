@@ -46,4 +46,9 @@ def run(input_path,
                                 progress_bar,
                                 verbose)
 
-    save_results(output, sampler_obj, cn_profiles.shape[1]-1, verbose)
+    if model == 'cn':
+        save_results(model, output, sampler_obj, cn_profiles.shape[1]-1)
+    elif model == 'one-more-clone':
+        save_results(model, output, sampler_obj, cn_profiles.shape[1])
+    else:
+        _print('Invalid model', verbose)

@@ -4,15 +4,10 @@ import numpy as np
 import pandas as pd
 import string
 import random
+import arviz as az
 
 
-def save_results(path, sampler_obj, num_subclones, verbose):
-    dct = sampler_obj.get_samples()
-    clones = list(string.ascii_uppercase)[:2] + ['normal']
-    rhos = pd.DataFrame(list(dct['rho']),columns=clones, dtype = float)
-    dct.pop('rho')
-    samples = pd.DataFrame.from_dict(dct)  # get samples from inference
-
+def save_results(model, path, sampler_obj, num_subclones):
     res_dir = os.path.dirname(path)
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)
@@ -21,8 +16,20 @@ def save_results(path, sampler_obj, num_subclones, verbose):
         os.remove(path)
 
     _print('Saving results', verbose)
-    samples.join(rhos).describe().loc[['mean']].to_csv(path, index=False)  # write mean of each sample site to csv file
-
+    clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
+    if model == 'one-more-clone':
+        arr = sampler_obj.posterior.new_clone_cn.to_numpy()
+        np.save('./inferred_new_cn_profile.npy', arr)
+        df = az.summary(sampler_obj, kind="stats")[-5:].T.head(1)
+        df.columns = clones + ['tau']
+        df.to_csv(path, index=False)
+    elif model == 'cn':
+        dct = sampler_obj.get_samples()
+        rhos = pd.DataFrame(list(dct['rho']),columns=clones, dtype = float)
+        dct.pop('rho')
+        samples = pd.DataFrame.from_dict(dct)  
+        samples.join(rhos).describe().loc[['mean']].to_csv(path, index=False)  
+        
 def get_random_string(length=10):
     """
     generate a random string - used to define unique file paths if running LiquidBayes in parallel
