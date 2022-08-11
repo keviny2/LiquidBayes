@@ -10,18 +10,6 @@ import src.main
     help='Path to input .bam'
 )
 @click.option(
-    '--gc',
-    type=click.STRING,
-    required=True,
-    help='Path to the gc content wig file'
-)
-@click.option(
-    '--mapp',
-    type=click.STRING,
-    required=True,
-    help='Path to the mappability wig file'
-)
-@click.option(
     '-c', '--cn-profiles-path',
     type=click.STRING,
     required=True,
@@ -34,10 +22,30 @@ import src.main
     help='Path to where the output is written to'
 )
 @click.option(
+    '-l', '--liquid-vcf',
+    type=click.STRING,
+    default='',
+    help='Path to liquid biopsy vcf file'
+)
+@click.option(
+    '-b', '--tissue-bams',
+    type=click.STRING,
+    default=[''],
+    help='Path to clone bam files (ex. ... -t path_to_clone_1 -t path_to_clone_2 -t path_to_clone_3 ...) - order of clones on the command line must be the same as copy-number profiles (--cn-profiles-path)',
+    multiple=True
+)
+@click.option(
+    '-t', '--tissue-vcfs',
+    type=click.STRING,
+    default=[''],
+    help='Path to clone vcf files (ex. ... -t path_to_clone_1 -t path_to_clone_2 -t path_to_clone_3 ...) - order of clones on the command line must be the same as copy-number profiles (--cn-profiles-path)',
+    multiple=True
+)   
+@click.option(
     '-m', '--model',
     type=click.STRING,
-    default='simple',
-    help='One of [simple]'
+    default='cn',
+    help='One of [cn]'
 )
 @click.option(
     '-n', '--num-samples',
@@ -56,6 +64,18 @@ import src.main
     type=click.INT,
     default=1,
     help='Seed for random functions'
+)
+@click.option(
+    '--gc',
+    type=click.STRING,
+    required=True,
+    help='Path to the gc content wig file'
+)
+@click.option(
+    '--mapp',
+    type=click.STRING,
+    required=True,
+    help='Path to the mappability wig file'
 )
 @click.option(
     '--progress-bar',

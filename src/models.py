@@ -5,7 +5,7 @@ import numpy as np
 import jax.numpy as jnp
 
 
-def simple(data, cn_profiles, num_clones):
+def cn(data, cn_profiles, num_clones):
     """
     :param data: (n,) numpy array
     :param cn_profiles: (n, num_clones) numpy array

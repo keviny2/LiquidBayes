@@ -21,6 +21,17 @@ from src.utils import get_random_string, _print
 
 
 def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
+    """
+    Run readCounter from hmmcopy_utils to get binned read counts
+    Arguments:
+        bam_file_path: a string
+        chrs: a string
+        bin_size: a string
+        qual: a string
+        verbose: a boolean
+    Returns:
+        Path to file containing binned read counts
+    """
     if not os.path.exists(bam_file_path + '.bai'):
         _print('Indexing {}'.format(bam_file_path), verbose)
         pysam.index(bam_file_path)
@@ -32,6 +43,15 @@ def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
     return readcount_path
 
 def correct_reads(readcount_path, gc_path, map_path):
+    """
+    Use HMMcopy package to perform gc and mappability correction
+    Arguments:
+        readcount_path: a string
+        gc_path: a string
+        map_path: a string
+    Returns:
+        Pandas dataframe with the corrected read counts
+    """
     hmmcopy = importr('HMMcopy')
     data = hmmcopy.wigsToRangedData(readcount_path, 
                                     gc_path,
