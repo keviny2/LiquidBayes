@@ -5,6 +5,7 @@ import pandas as pd
 import string
 import random
 import arviz as az
+from scipy import stats
 
 
 def save_results(model, path, sampler_obj, num_subclones):
@@ -19,10 +20,13 @@ def save_results(model, path, sampler_obj, num_subclones):
     clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
     if model == 'one-more-clone':
         arr = sampler_obj.posterior.new_clone_cn.to_numpy()
-        np.save('./inferred_new_cn_profile.npy', arr)
+        arr = arr.reshape(arr.shape[0]*arr.shape[1], arr.shape[2])
+        res = stats.mode(arr)[0][0]   ### Getting the mode across chains and all samples
+        df_cn = pd.DataFrame(res, columns=[f"Inferred_cn_profile[{i+1}]" for i in range(arr.shape[0])])
         df = az.summary(sampler_obj, kind="stats")[-5:].T.head(1)
         df.columns = clones + ['tau']
-        df.to_csv(path, index=False)
+        result = pd.concate([df, df_cn], axis=1)
+        result.to_csv(path, index=False)
     elif model == 'cn':
         dct = sampler_obj.get_samples()
         rhos = pd.DataFrame(list(dct['rho']),columns=clones, dtype = float)

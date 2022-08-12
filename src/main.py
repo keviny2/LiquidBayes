@@ -27,7 +27,7 @@ def run(input_path,
     data, cn_profiles = preprocess_cn_configs(raw_data, raw_cn_profiles, verbose)
 
     # get counts at SNV locations if applicable
-    if tissue_bams == [''] and tissue_vcfs == ['']:
+    if tissue_bams == ('',) and tissue_vcfs == ('',):
         counts = None
     else:
         counts_liquid = get_counts(input_path, liquid_vcf, verbose)
