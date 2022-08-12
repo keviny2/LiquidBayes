@@ -8,7 +8,7 @@ import arviz as az
 from scipy import stats
 
 
-def save_results(model, path, sampler_obj, num_subclones):
+def save_results(model, path, sampler_obj, num_subclones, verbose):
     res_dir = os.path.dirname(path)
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)

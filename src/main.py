@@ -1,8 +1,7 @@
 from src.inference import run_inference
 from src.preprocessing import preprocess_cn_configs, get_reads, preprocess_bam_file
 from src.process_snvs import get_counts, combine_counts
-from src.utils import save_results
-
+from src.utils import save_results, _print
 
 def run(input_path,
         cn_profiles_path,
@@ -47,8 +46,8 @@ def run(input_path,
                                 verbose)
 
     if model == 'cn':
-        save_results(model, output, sampler_obj, cn_profiles.shape[1]-1)
+        save_results(model, output, sampler_obj, cn_profiles.shape[1]-1, verbose)
     elif model == 'one-more-clone':
-        save_results(model, output, sampler_obj, cn_profiles.shape[1])
+        save_results(model, output, sampler_obj, cn_profiles.shape[1], verbose)
     else:
         _print('Invalid model', verbose)
