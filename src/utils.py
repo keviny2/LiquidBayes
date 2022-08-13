@@ -21,8 +21,9 @@ def save_results(model, path, sampler_obj, num_subclones, verbose):
     if model == 'one-more-clone':
         arr = sampler_obj.posterior.new_clone_cn.to_numpy()
         arr = arr.reshape(arr.shape[0]*arr.shape[1], arr.shape[2])
-        res = stats.mode(arr)[0][0]   ### Getting the mode across chains and all samples
-        df_cn = pd.DataFrame(res, columns=[f"Inferred_cn_profile[{i+1}]" for i in range(arr.shape[0])])
+        res = stats.mode(arr, keepdims=True)[0]   ### Getting the mode across chains and all samples
+        print(res.shape)
+        df_cn = pd.DataFrame(res, columns=[f"Inferred_cn_profile[{i+1}]" for i in range(res.shape[1])])
         df = az.summary(sampler_obj, kind="stats")[-5:].T.head(1)
         df.columns = clones + ['tau']
         result = pd.concate([df, df_cn], axis=1)
