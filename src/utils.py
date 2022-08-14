@@ -26,7 +26,7 @@ def save_results(model, path, sampler_obj, num_subclones, verbose):
         df_cn = pd.DataFrame(res, columns=[f"Inferred_cn_profile[{i+1}]" for i in range(res.shape[1])])
         df = az.summary(sampler_obj, kind="stats")[-5:].T.head(1)
         df.columns = clones + ['tau']
-        result = pd.concate([df, df_cn], axis=1)
+        result = pd.concat([df, df_cn], axis=1)
         result.to_csv(path, index=False)
     elif model == 'cn':
         dct = sampler_obj.get_samples()
