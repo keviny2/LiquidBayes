@@ -67,7 +67,7 @@ def combine_counts(counts_liquid, counts_clones, verbose):
         counts_liquid: a pandas dataframe
         counts_clones: a pandas dataframe
     Returns:
-        numpy array with shape (N, 3+K) - N=length of intersection of SNV positions across all dfs, K=num elems in counts_clones, add 3 for the event_id, reference and alternate allele counts for counts_liquid
+        numpy array with shape (L, 2+K) - L=length of intersection of SNV positions across all dfs, K=ref and alt counts for counts_liquid and num clones
     """
 
     _print("Combining counts at SNV positions from all files", verbose)
@@ -85,7 +85,7 @@ def combine_counts(counts_liquid, counts_clones, verbose):
 
     # construct an LxJ matrix (L=num common SNVs, J=num clones) approximating mutant copies at SNV l for clone j
     # ASSUME: rows of all dfs are sorted by event_id AND there is at least one read at each SNV (ref_counts + alt_counts > 0)
-    counts_liquid_filtered = counts_liquid[counts_liquid['event_id'].isin(intersection)] # filter rows
+    counts_liquid_filtered = counts_liquid[counts_liquid['event_id'].isin(intersection)].drop(columns=['event_id']) # filter rows
     counts = [counts_liquid_filtered]
     for clone in temp_clones:
         clone_filtered = clone[clone['event_id'].isin(intersection)] # filter rows

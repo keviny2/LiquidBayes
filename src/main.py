@@ -1,7 +1,7 @@
 from src.inference import run_inference
 from src.preprocessing import preprocess_cn_configs, get_reads, preprocess_bam_file
 from src.process_snvs import get_counts, combine_counts
-from src.utils import save_results
+from src.utils import save_results, _print
 
 
 def run(input_path,
@@ -33,7 +33,7 @@ def run(input_path,
         counts_liquid = get_counts(input_path, liquid_vcf, verbose)
         counts_clones = []
         for i in range(len(tissue_vcfs)):
-            curr = counts_clones.append(get_counts(tissue_bams[i], tissue_vcfs[i]))
+            counts_clones.append(get_counts(tissue_bams[i], tissue_vcfs[i], verbose))
         counts = combine_counts(counts_liquid, counts_clones, verbose)
 
     sampler_obj = run_inference(model,
@@ -46,9 +46,9 @@ def run(input_path,
                                 progress_bar,
                                 verbose)
 
-    if model == 'cn':
-        save_results(model, output, sampler_obj, cn_profiles.shape[1]-1)
+    if model in ['cn', 'cn_snv']:
+        save_results(model, output, sampler_obj, cn_profiles.shape[1]-1, verbose)
     elif model == 'one-more-clone':
-        save_results(model, output, sampler_obj, cn_profiles.shape[1])
+        save_results(model, output, sampler_obj, cn_profiles.shape[1], verbose)
     else:
         _print('Invalid model', verbose)

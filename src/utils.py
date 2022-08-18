@@ -7,7 +7,7 @@ import random
 import arviz as az
 
 
-def save_results(model, path, sampler_obj, num_subclones):
+def save_results(model, path, sampler_obj, num_subclones, verbose):
     res_dir = os.path.dirname(path)
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)
@@ -23,7 +23,7 @@ def save_results(model, path, sampler_obj, num_subclones):
         df = az.summary(sampler_obj, kind="stats")[-5:].T.head(1)
         df.columns = clones + ['tau']
         df.to_csv(path, index=False)
-    elif model == 'cn':
+    elif model in ['cn', 'cn_snv']:
         dct = sampler_obj.get_samples()
         rhos = pd.DataFrame(list(dct['rho']),columns=clones, dtype = float)
         dct.pop('rho')
