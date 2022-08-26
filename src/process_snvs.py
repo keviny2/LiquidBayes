@@ -91,4 +91,7 @@ def combine_counts(counts_liquid, counts_clones, verbose):
         clone_filtered = clone[clone['event_id'].isin(intersection)] # filter rows
         copy_est = clone_filtered.apply(lambda row: row.alt_counts / (row.ref_counts + row.alt_counts), axis=1) # compute estimate for num mutant copies 
         counts.append(np.reshape(copy_est.to_numpy(), (-1, 1)))
-    return np.concatenate(counts, axis=1)
+    counts = np.concatenate(counts, axis=1)
+    #n = len(counts)
+    #counts[:, 2:] = (counts[:, 2:] * (n-1) + .5) / n
+    return counts

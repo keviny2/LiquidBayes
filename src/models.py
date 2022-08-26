@@ -32,11 +32,21 @@ def cn_snv(data, cn_profiles, counts, num_clones):
     with numpyro.plate('data', size=len(data)):
         numpyro.sample('obs', numdist.StudentT(df=4, loc=mu, scale=tau), obs=data)
 
-    xi = jnp.sum(counts[:, 3:]*rho, axis=1)
+    xi = jnp.sum(counts[:, 2:]*rho, axis=1)
     d = jnp.sum(counts[:, :2], axis=1)
     b = counts[:, 1]
     with numpyro.plate('snv', size=len(xi)):
         numpyro.sample('snv_obs', numdist.Binomial(d, xi), obs=b)
+    #d = jnp.sum(counts[:, :2], axis=1)
+    #b = counts[:, 1]
+    #nu = counts[:, 2:]
+    #with numpyro.plate('snv', size=len(nu)):
+    #    theta = jnp.ones(nu.shape)
+    #    for i in range(num_clones-1):
+    #        theta.at[:, i].set(numpyro.sample(f'theta_{i}', numdist.BetaProportion(nu[:, i], 1)))
+    #    clone_props = rho[:-1]
+    #    xi = jnp.sum(theta*clone_props, axis=1)
+    #    numpyro.sample('snv_obs', numdist.Binomial(d, xi), obs=b)
 
 def one_more_clone(data, cn_profiles, num_clones, prob):
     """
