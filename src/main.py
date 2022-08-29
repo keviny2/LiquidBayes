@@ -20,10 +20,11 @@ def run(input_path,
         chrs,
         bin_size,
         qual,
-        verbose):
+        verbose,
+        temp_dir):
 
     # load data and preprocess
-    raw_data, raw_cn_profiles = preprocess_bam_file(input_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose)
+    raw_data, raw_cn_profiles = preprocess_bam_file(input_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose, temp_dir)
     data, cn_profiles = preprocess_cn_configs(raw_data, raw_cn_profiles, verbose)
 
     # get counts at SNV locations if applicable

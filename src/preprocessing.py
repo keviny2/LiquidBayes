@@ -20,7 +20,7 @@ from src.utils import get_random_string, _print
 
 
 
-def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
+def get_reads(bam_file_path, chrs, bin_size, qual, verbose, temp_dir):
     """
     Run readCounter from hmmcopy_utils to get binned read counts
     Arguments:
@@ -29,6 +29,7 @@ def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
         bin_size: a string
         qual: a string
         verbose: a boolean
+        temp_dir: a string
     Returns:
         Path to file containing binned read counts
     """
@@ -36,8 +37,8 @@ def get_reads(bam_file_path, chrs, bin_size, qual, verbose):
         _print('Indexing {}'.format(bam_file_path), verbose)
         pysam.index(bam_file_path)
 
-    readcount_path = f'temp/readcounts{get_random_string()}.wig'
-    os.makedirs('temp', exist_ok=True)
+    readcount_path = os.path.join(temp_dir, f'readcounts{get_random_string()}.wig')
+    os.makedirs(temp_dir, exist_ok=True)
     command = f"readCounter {bam_file_path} -c {chrs} -w {bin_size} -q {qual} > {readcount_path}"
     subprocess.run(command, shell=True, check=True)
     return readcount_path
@@ -78,10 +79,10 @@ def intersect(corrected_readcounts, cn_profiles_path):
     corrected_readcounts_intersected = pd.concat([gr1.df.astype({'Chromosome': int}), gr2.df.astype({'Chromosome': int})], axis=1).dropna()
     return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
 
-def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose):
+def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose, temp_dir):
     _print('Processing .bam file', verbose)
     _print('Getting readcounts', verbose)
-    readcount_path = get_reads(bam_file_path, chrs, bin_size, qual, verbose)
+    readcount_path = get_reads(bam_file_path, chrs, bin_size, qual, verbose, temp_dir)
 
     _print('Correcting readcounts', verbose)
     corrected_readcounts = correct_reads(readcount_path, gc, mapp)

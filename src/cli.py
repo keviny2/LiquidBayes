@@ -107,6 +107,12 @@ import src.main
     default=False,
     help='Allow printing'
 )
+@click.option(
+    '--temp-dir',
+    type=click.STRING,
+    default='.temp',
+    help='Directory to write dummy files to'
+)
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
     """
