@@ -42,8 +42,6 @@ def cn_snv(data, cn_profiles, counts, num_clones):
     d = jnp.sum(counts[:, :2], axis=1)
     b = counts[:, 1]
     nu = counts[:, 2:]
-    print("nu.shape", nu.shape)
-    print("num_clones", num_clones)
     with numpyro.plate('snv', size=len(nu)):
         theta = jnp.ones(nu.shape)
         for i in range(num_clones-1):
