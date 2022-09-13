@@ -35,7 +35,7 @@ def run(input_path,
         counts_clones = []
         for i in range(len(tissue_vcfs)):
             counts_clones.append(get_counts(tissue_bams[i], tissue_vcfs[i], verbose))
-        counts = combine_counts(counts_liquid, counts_clones, verbose)
+        counts = combine_counts(counts_liquid, counts_clones, cn_profiles, verbose)
 
     sampler_obj = run_inference(model,
                                 data.squeeze(),

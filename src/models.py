@@ -36,7 +36,7 @@ def cn_snv(data, cn_profiles, counts, num_clones):
     d = jnp.sum(counts[:, :2], axis=1)
     b = counts[:, 1]
     with numpyro.plate('snv', size=len(xi)):
-        numpyro.sample('snv_obs', numdist.Binomial(d, xi), obs=b)
+        numpyro.sample('snv_obs', numdist.BinomialLogits(xi, d), obs=b)
 
     #n = len(counts)
     #counts[:, 2:] = (counts[:, 2:] * (n-1) + .5) / n  # transform clone level counts for BetaProportion distribution
