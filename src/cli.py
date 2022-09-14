@@ -1,5 +1,4 @@
 import click
-
 import src.main
 
 @click.command(name='run')
@@ -45,7 +44,7 @@ import src.main
     '-m', '--model',
     type=click.STRING,
     default='cn',
-    help='One of [cn, one-more-clone]'
+    help='Model type (one of {cn, cn_snv})'
 )
 @click.option(
     '-n', '--num-samples',
@@ -63,7 +62,7 @@ import src.main
     '-s', '--seed',
     type=click.INT,
     default=1,
-    help='Seed for random functions'
+    help='Seed for pseudo-random functions'
 )
 @click.option(
     '--gc',

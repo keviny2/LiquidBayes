@@ -61,7 +61,7 @@ def get_counts(bam_path, vcf_path, verbose):
     return pd.DataFrame(df)
 
 
-def combine_counts(counts_liquid, counts_clones, cn_profiles, verbose):
+def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
     """
     Get ref and alt counts from liquid biopsy and estimates for mutant copies for each clone
     Arguments:
@@ -69,7 +69,7 @@ def combine_counts(counts_liquid, counts_clones, cn_profiles, verbose):
         counts_clones: a pandas dataframe
         cn_profiles: a numpy array
     Returns:
-        numpy array with shape (L, 2+K) - L=length of intersection of SNV positions across all dfs, 2+K=ref and alt counts for liquid biopsy and K estimates for mutant copies for each clone (excluding normal)
+        ndarray with shape (L, 2+K) - L=length of intersection of SNV positions across all dfs, 2+K=ref and alt counts for liquid biopsy and K estimates for mutant copies for each clone (excluding normal)
     """
     
     def valid(event_id, ranges):
@@ -85,7 +85,7 @@ def combine_counts(counts_liquid, counts_clones, cn_profiles, verbose):
         chromosome, pos = int(event_id_list[0]), int(event_id_list[1])
         return ranges[chromosome][0] <= pos <= ranges[chromosome][1]    
 
-    _print("Combining counts at SNV positions from all files", verbose)
+    _print("Processing counts from liquid biopsy and estimating mutant copies for each clone", verbose)
 
     cn_profiles = pd.DataFrame(data=cn_profiles)
     counts_liquid = counts_liquid.drop_duplicates(subset=['event_id']).drop(counts_liquid[counts_liquid.ref_counts + counts_liquid.alt_counts == 0].index)  # drop rows with 0 reads

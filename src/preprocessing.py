@@ -77,7 +77,7 @@ def intersect(corrected_readcounts, cn_profiles_path):
     gr2 = cn_profiles_gr.intersect(corrected_readcounts_gr)
 
     corrected_readcounts_intersected = pd.concat([gr1.df.astype({'Chromosome': int}), gr2.df.astype({'Chromosome': int})], axis=1).dropna()
-    return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, -3:].to_numpy().squeeze()
+    return corrected_readcounts_intersected[['copy']].to_numpy().squeeze(), corrected_readcounts_intersected.iloc[:, 4:].to_numpy().squeeze()
 
 def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose, temp_dir):
     _print('Processing .bam file', verbose)
@@ -95,18 +95,26 @@ def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, g
 
     return data, cn_profiles
     
-def preprocess_cn_configs(data, cn_profiles, verbose):
-    _print('Preprocessing within copy number configurations', verbose)
+def remove_outliers(data, cn_profiles, verbose):
+    """
+    Remove outliers based on CN configuration - ex. (2,2,2), (2,3,2)
+    Arguments:
+        data: ndarray
+        cn_profiles: ndarray
+        verbose: bool
+    Returns:
+        Two ndarrays corresponding to original arguments data, cn_profiles with outliers filtered out
+    """
 
-    def remove_outliers(cn_config, data, cn_profiles, indices, vals):
+    _print('Identifying and removing outliers based on copy number configurations', verbose)
+
+    def remove_outliers_in_cn_config(cn_config, data, cn_profiles, indices, vals):
         """
-        given a CN configuration and dataset, remove values at indices which correspond to outliers
+        For a specific CN configuration, remove outliers by fitting a two component GMM
         Arguments:
             cn_config: tuple
             data: ndarray
             cn_profiles: ndarray
-        Returns:
-            dataset with outliers removed
         """
             
         # fit gmm
@@ -120,7 +128,7 @@ def preprocess_cn_configs(data, cn_profiles, verbose):
         # remove outliers from data.obs
         outlier_idxs = np.array(indices[cn_config]).reshape(-1,1)[labels == 0]
         
-        # set the outliers as nans and remove afterwards
+        # set the outliers to nan
         data[outlier_idxs] = np.nan
         cn_profiles[outlier_idxs] = np.nan
 
@@ -128,14 +136,14 @@ def preprocess_cn_configs(data, cn_profiles, verbose):
     indices = defaultdict(list)
     vals = defaultdict(list)
     for n in range(len(data)):
-        indices[tuple(cn_profiles[n])].append(n)  # append the index to data.obs
-        vals[tuple(cn_profiles[n])].append(data[n])
+        indices[tuple(cn_profiles[n, 3:])].append(n)  # don't need first 3 columns containing genomic position information
+        vals[tuple(cn_profiles[n, 3:])].append(data[n])
         
     # remove outliers from each CN configuration
     for cn_config in list(vals.keys()):
         if len(vals[cn_config]) < 50:
             continue
-        remove_outliers(cn_config, data, cn_profiles, indices, vals)
+        remove_outliers_in_cn_config(cn_config, data, cn_profiles, indices, vals)
 
     nan_idxs = ~np.isnan(data)
     data = data[nan_idxs]
