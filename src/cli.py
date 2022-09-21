@@ -112,7 +112,6 @@ import src.main
     default='.temp',
     help='Directory to write dummy files to (must have read and write access to folder)'
 )
-@click.option(
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
     """
