@@ -12,7 +12,7 @@ LiquidBayes offers 2 models: `cn` and `cn_snv`. The required parameters will dif
 
 ### `cn` model
 #### Required Parameters
-- `-i --input-path` Path to input bam file
+- `-i --input-path` Path to liquid bam file
 - `-c --cn-profiles-path` Path to file with the copy-number profiles for each clone (.bed format)
 - `-o --output` Write output to this file (.csv format)
 - `--gc` Path to gc content (.wig format)

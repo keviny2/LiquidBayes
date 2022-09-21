@@ -3,13 +3,13 @@ import src.main
 
 @click.command(name='run')
 @click.option(
-    '-i', '--input-path', 
+    '-i', '--liquid-bam', 
     type=click.STRING,
     required=True,
-    help='Path to input .bam'
+    help='Path to liquid bam file'
 )
 @click.option(
-    '-c', '--cn-profiles-path',
+    '-c', '--cn-profiles',
     type=click.STRING,
     required=True,
     help='Path to input .bed file with the copy-number profiles for each clone'
@@ -27,14 +27,14 @@ import src.main
     help='Path to liquid biopsy vcf file'
 )
 @click.option(
-    '-b', '--tissue-bams',
+    '-b', '--clone-bams',
     type=click.STRING,
     default=[''],
     help='Path to clone bam files (ex. ... -t path_to_clone_1 -t path_to_clone_2 -t path_to_clone_3 ...) - order of clones on the command line must be the same as copy-number profiles (--cn-profiles-path)',
     multiple=True
 )
 @click.option(
-    '-t', '--tissue-vcfs',
+    '-v', '--clone-vcfs',
     type=click.STRING,
     default=[''],
     help='Path to clone vcf files (ex. ... -t path_to_clone_1 -t path_to_clone_2 -t path_to_clone_3 ...) - order of clones on the command line must be the same as copy-number profiles (--cn-profiles-path)',
@@ -110,8 +110,9 @@ import src.main
     '--temp-dir',
     type=click.STRING,
     default='.temp',
-    help='Directory to write dummy files to'
+    help='Directory to write dummy files to (must have read and write access to folder)'
 )
+@click.option(
 def run(**kwargs):
     """ Fit LiquidBayes model to data.
     """
