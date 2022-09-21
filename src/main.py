@@ -21,8 +21,7 @@ def run(liquid_bam,
         bin_size,
         qual,
         verbose,
-        temp_dir,
-        cache):
+        temp_dir):
 
     # load data and preprocess
     raw_data, raw_cn_profiles = preprocess_bam_file(liquid_bam, cn_profiles, chrs, bin_size, qual, gc, mapp, verbose, temp_dir)
