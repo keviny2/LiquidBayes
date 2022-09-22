@@ -109,7 +109,9 @@ def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
         
     # get all bins (rows) from cn_profiles that contain an SNV shared across all clones
     counts_liquid_filtered = counts_liquid[counts_liquid['event_id'].isin(intersection)]
-    counts_liquid_filtered[['chr', 'pos']] = counts_liquid_filtered['event_id'].str.split(':', expand=True).iloc[:, :2]
+    chr_pos_filtered = counts_liquid_filtered['event_id'].str.split(':', expand=True).iloc[:, :2]
+    counts_liquid_filtered['chr'] = chr_pos_filtered.iloc[:, 0]
+    counts_liquid_filtered['pos'] = chr_pos_filtered.iloc[:, 1]
     counts_liquid_filtered.drop(columns=['event_id'], inplace=True) 
     
     # REQUIRES: all snv pos are in a cn_profiles bin
