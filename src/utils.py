@@ -9,6 +9,9 @@ import arviz as az
 from scipy import stats
 
 
+def get_extension(file_path):
+    return os.path.splitext(file_path)[1]
+
 def save_results(path, sampler_obj, num_subclones, verbose):
     res_dir = os.path.dirname(path)
     if not os.path.exists(res_dir):

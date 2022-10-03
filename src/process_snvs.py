@@ -60,7 +60,6 @@ def get_counts(bam_path, vcf_path, verbose):
 
     return pd.DataFrame(df)
 
-
 def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
     """
     Get ref and alt counts from liquid biopsy and estimates for mutant copies for each clone
@@ -71,7 +70,7 @@ def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
     Returns:
         ndarray with shape (L, 2+K) - L=length of intersection of SNV positions across all dfs, 2+K=ref and alt counts for liquid biopsy and K estimates for mutant copies for each clone (excluding normal)
     """
-    
+
     def valid(event_id, ranges):
         """
         Check if the genomic position described by event_id is included in bins defined by ranges
@@ -108,10 +107,10 @@ def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
         intersection = intersection & set(clone.event_id)   
         
     # get all bins (rows) from cn_profiles that contain an SNV shared across all clones
-    counts_liquid_filtered = counts_liquid[counts_liquid['event_id'].isin(intersection)]
-    chr_pos_filtered = counts_liquid_filtered['event_id'].str.split(':', expand=True).iloc[:, :2]
-    counts_liquid_filtered['chr'] = chr_pos_filtered.iloc[:, 0]
-    counts_liquid_filtered['pos'] = chr_pos_filtered.iloc[:, 1]
+    counts_liquid_filtered = counts_liquid[counts_liquid['event_id'].isin(intersection)].copy()
+    chr_pos_filtered = counts_liquid_filtered['event_id'].str.split(':', expand=True).iloc[:, :2].copy()
+    counts_liquid_filtered['chr'] = chr_pos_filtered.iloc[:, 0].copy()
+    counts_liquid_filtered['pos'] = chr_pos_filtered.iloc[:, 1].copy()
     counts_liquid_filtered.drop(columns=['event_id'], inplace=True) 
     
     # REQUIRES: all snv pos are in a cn_profiles bin
@@ -136,5 +135,4 @@ def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
         counts.append(np.reshape(copy_est.to_numpy(), (-1, 1)))
     counts = pd.DataFrame(data=np.concatenate(counts, axis=1), dtype=float)
     counts.iloc[:, 2:] = counts.iloc[:, 2:].to_numpy() * res.to_numpy()  # multiply estimate for num mutant copies by corresponding CN
-    # counts.iloc[:, 2:] = counts.iloc[:, 2:].apply(lambda row: row / row.sum(), axis=1)  # normalize (might not need to if using BinomialLogit in model)
     return counts.to_numpy()

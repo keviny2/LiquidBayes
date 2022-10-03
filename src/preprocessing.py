@@ -19,7 +19,11 @@ logger.setLevel(logging.ERROR)
 from src.utils import get_random_string, _print
 
 
-
+def load_data(liquid_bam, cn_profiles_path):
+    raw_data = np.genfromtxt(liquid_bam, delimiter='\t')
+    raw_cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')
+    return raw_data, raw_cn_profiles
+    
 def get_reads(bam_file_path, chrs, bin_size, qual, verbose, temp_dir):
     """
     Run readCounter from hmmcopy_utils to get binned read counts

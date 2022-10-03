@@ -9,7 +9,7 @@ import src.main
     help='Path to liquid bam file'
 )
 @click.option(
-    '-c', '--cn-profiles',
+    '-c', '--cn-profiles-path',
     type=click.STRING,
     required=True,
     help='Path to input .bed file with the copy-number profiles for each clone'
@@ -67,13 +67,13 @@ import src.main
 @click.option(
     '--gc',
     type=click.STRING,
-    required=True,
+    default=None,
     help='Path to the gc content wig file'
 )
 @click.option(
     '--mapp',
     type=click.STRING,
-    required=True,
+    default=None,
     help='Path to the mappability wig file'
 )
 @click.option(

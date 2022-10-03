@@ -1,11 +1,11 @@
 from src.inference import run_inference
-from src.preprocessing import remove_outliers, get_reads, preprocess_bam_file
+from src.preprocessing import remove_outliers, get_reads, preprocess_bam_file, load_data
 from src.process_snvs import get_counts, process_counts
-from src.utils import save_results, _print
+from src.utils import save_results, _print, get_extension
 
 
 def run(liquid_bam,
-        cn_profiles,
+        cn_profiles_path,
         output,
         liquid_vcf,
         clone_bams,
@@ -24,7 +24,11 @@ def run(liquid_bam,
         temp_dir):
 
     # load data and preprocess
-    raw_data, raw_cn_profiles = preprocess_bam_file(liquid_bam, cn_profiles, chrs, bin_size, qual, gc, mapp, verbose, temp_dir)
+    if get_extension(liquid_bam) == '.tsv':
+        raw_data, raw_cn_profiles = load_data(liquid_bam, cn_profiles_path)
+    elif get_extension(liquid_bam) == '.bam':
+        raw_data, raw_cn_profiles = preprocess_bam_file(liquid_bam, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose, temp_dir)
+
     data, cn_profiles = remove_outliers(raw_data, raw_cn_profiles, verbose)
 
     # get counts at SNV locations if applicable
