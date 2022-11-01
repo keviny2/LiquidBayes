@@ -1,13 +1,10 @@
-import os
-import aesara.tensor as at
 import numpy as np
 import numpyro
-import pymc as pm
 from numpyro.infer import MCMC, NUTS
 from jax import random
 
 from src.utils import _print
-from src.models import cn, cn_snv, one_more_clone
+from src.models import cn, cn_snv
 
 
 def run_inference(model,
@@ -31,9 +28,6 @@ def run_inference(model,
         return sampler_obj
 
     if model == 'cn_snv':
-        np.savetxt('data.tsv', data, delimiter='\t')
-        np.savetxt('cn_profiles.tsv', cn_profiles, delimiter='\t')
-        np.savetxt('counts.tsv', counts, delimiter='\t')
         sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
                                          num_warmup=num_warmup,
                                          num_samples=num_samples,

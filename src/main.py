@@ -1,7 +1,7 @@
 from src.inference import run_inference
-from src.preprocessing import remove_outliers, get_reads, preprocess_bam_file, load_data
+from src.preprocessing import remove_outliers, get_reads, preprocess_bam_file
 from src.process_snvs import get_counts, process_counts
-from src.utils import save_results, _print, get_extension
+from src.utils import save_results, _print, get_extension, load_data, load_counts
 
 
 def run(liquid_bam,
@@ -10,6 +10,7 @@ def run(liquid_bam,
         liquid_vcf,
         clone_bams,
         clone_vcfs,
+        counts_mat,
         model,
         num_samples,
         num_warmup,
@@ -32,7 +33,9 @@ def run(liquid_bam,
     data, cn_profiles = remove_outliers(raw_data, raw_cn_profiles, verbose)
 
     # get counts at SNV locations if applicable
-    if clone_bams == ('',) and clone_vcfs == ('',) or model == 'cn':
+    if counts_mat is not None:
+        counts = load_counts(counts_mat)
+    elif clone_bams == ('',) and clone_vcfs == ('',) or model == 'cn':
         counts = None
     else:
         counts_liquid = get_counts(liquid_bam, liquid_vcf, verbose)

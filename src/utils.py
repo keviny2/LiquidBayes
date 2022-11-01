@@ -9,6 +9,14 @@ import arviz as az
 from scipy import stats
 
 
+def load_data(liquid_bam, cn_profiles_path):
+    raw_data = np.genfromtxt(liquid_bam, delimiter='\t')
+    raw_cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')
+    return raw_data, raw_cn_profiles
+
+def load_counts(counts_mat):
+    return np.genfromtxt(counts_mat, delimiter='\t')
+    
 def get_extension(file_path):
     return os.path.splitext(file_path)[1]
 
@@ -25,8 +33,8 @@ def save_results(path, sampler_obj, num_subclones, verbose):
     samples = sampler_obj.get_samples()
     rhos = pd.DataFrame(list(samples['rho']),columns=clones, dtype = float)
     samples.pop('rho')
-    samples = pd.DataFrame.from_dict(samples)  
-    samples.join(rhos).describe().loc[['mean']].to_csv(path, index=False)  
+    samples = pd.DataFrame.from_dict(samples).join(rhos).to_csv(path, index=False)
+    # samples.join(rhos).describe().loc[['mean']].to_csv(path, index=False)  
         
 def get_random_string(length=10):
     """

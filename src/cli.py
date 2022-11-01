@@ -41,6 +41,12 @@ import src.main
     multiple=True
 )   
 @click.option(
+    '--counts-mat',
+    type=click.STRING,
+    default=None,
+    help='Path to count matrix. Tab delimited.'
+)
+@click.option(
     '-m', '--model',
     type=click.STRING,
     default='cn',

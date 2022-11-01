@@ -19,11 +19,6 @@ logger.setLevel(logging.ERROR)
 from src.utils import get_random_string, _print
 
 
-def load_data(liquid_bam, cn_profiles_path):
-    raw_data = np.genfromtxt(liquid_bam, delimiter='\t')
-    raw_cn_profiles = np.genfromtxt(cn_profiles_path, delimiter='\t')
-    return raw_data, raw_cn_profiles
-    
 def get_reads(bam_file_path, chrs, bin_size, qual, verbose, temp_dir):
     """
     Run readCounter from hmmcopy_utils to get binned read counts
@@ -86,6 +81,10 @@ def intersect(corrected_readcounts, cn_profiles_path):
 def preprocess_bam_file(bam_file_path, cn_profiles_path, chrs, bin_size, qual, gc, mapp, verbose, temp_dir):
     _print('Processing .bam file', verbose)
     _print('Getting readcounts', verbose)
+
+    if gc is None or mapp is None:
+        raise RuntimeError("Must specify GC and Mappability files!")
+
     readcount_path = get_reads(bam_file_path, chrs, bin_size, qual, verbose, temp_dir)
 
     _print('Correcting readcounts', verbose)
