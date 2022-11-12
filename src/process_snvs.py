@@ -66,7 +66,7 @@ def process_counts(counts_liquid, counts_clones, cn_profiles, verbose):
     Get ref and alt counts from liquid biopsy and estimates for mutant copies for each clone
     Arguments:
         counts_liquid: a pandas dataframe
-        counts_clones: a pandas dataframe
+        counts_clones: list of pandas dataframes
         cn_profiles: a numpy array
     Returns:
         ndarray with shape (L, 2+K) - L=length of intersection of SNV positions across all dfs, 2+K=ref and alt counts for liquid biopsy and K estimates for mutant copies for each clone (excluding normal)
