@@ -4,7 +4,7 @@ import numpy as np
 import jax.numpy as jnp
 from jax.random import PRNGKey
 
-def cn(data, cn_profiles, num_clones):
+def base(data, cn_profiles, num_clones):
     """
     :param data: (n,) numpy array
     :param cn_profiles: (n, num_clones) numpy array
@@ -16,7 +16,7 @@ def cn(data, cn_profiles, num_clones):
     with numpyro.plate('data', size=len(data)):
         numpyro.sample('obs', numdist.StudentT(df=4, loc=mu, scale=tau), obs=data)
 
-def cn_snv(data, cn_profiles, counts, num_clones):
+def extended(data, cn_profiles, counts, num_clones):
     """
     :param data: (n,) numpy array
     :param cn_profiles: (n, num_clones) numpy array

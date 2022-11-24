@@ -42,19 +42,10 @@ def run(liquid_bam,
         counts_clones = []
         for i in range(len(clone_vcfs)):
             counts_clones.append(get_counts(clone_bams[i], clone_vcfs[i], verbose))
-
-        #import pandas as pd
-        # writing to csv files
-        #counts_liquid.to_csv('counts_liquid.csv')
-        #for i, counts_clone in enumerate(counts_clones):
-        #    counts_clone.to_csv(f'clone_{i}.csv')
-
-        # reading already processed csv files
-        #counts_liquid = pd.read_csv(liquid_vcf, index_col=0)
-        #counts_clones = []
-        #for i in range(len(clone_vcfs)):
-        #    counts_clones.append(pd.read_csv(clone_vcfs[i], index_col=0))
         counts = process_counts(counts_liquid, counts_clones, cn_profiles, verbose)
+        # use base model if there are no common SNVs between liquid and tissue biopsies
+        if counts is None:
+            model = 'base'
 
     cn_profiles = cn_profiles[:, 3:].squeeze()  # first three columns are genomic bin information which we don't need for inference
     data = data.squeeze()

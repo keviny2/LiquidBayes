@@ -18,15 +18,6 @@ def get_extension(file_path):
     return os.path.splitext(file_path)[1]
 
 def save_results(path, sampler_obj, num_subclones, verbose):
-    if os.path.isdir(path):
-        res_dir = os.path.dirname(path)
-        if not os.path.exists(res_dir):
-            os.makedirs(res_dir)
-
-    if os.path.exists(path):
-        _print('Overwriting {}'.format(os.path.basename(path)), verbose)
-        os.remove(path)
-
     _print('Saving results', verbose)
     clones = list(string.ascii_uppercase)[:num_subclones] + ['normal']
     samples = sampler_obj.get_samples()

@@ -68,7 +68,7 @@ def intersect(corrected_readcounts, cn_profiles_path):
     # format column names for PyRanges
     corrected_readcounts.rename(columns={'chr': 'Chromosome', 'start': 'Start', 'end': 'End'}, inplace=True)
     cn_profiles.columns = [str(num) for num in range(cn_profiles.shape[1])]
-    cn_profiles.rename(columns={'0': 'Chromosome', '1': 'Start', '2': 'End'}, inplace=True)
+    cn_profiles = cn_profiles.rename(columns={'0': 'Chromosome', '1': 'Start', '2': 'End'}).astype({'Chromosome': int, 'Start': int, 'End': int})
 
     # intersect both ways
     corrected_readcounts_gr, cn_profiles_gr = pr.PyRanges(corrected_readcounts).sort(), pr.PyRanges(cn_profiles).sort()
