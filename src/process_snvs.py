@@ -146,13 +146,8 @@ def process_counts(_counts_liquid, _counts_clones, _cn_profiles, verbose):
         counts_clone[uppercase_letters[i]] = counts_clone.apply(compute_vaf, axis=1)
         counts_clone.drop(columns=['ref_counts', 'alt_counts'], inplace=True) # drop ref and alt counts
 
-    # outer join all clone vafs
-    vafs = reduce(lambda left, right: pd.merge(left, right, on=['event_id'], how='outer'), counts_clones).fillna(0)
-    counts_liquid_and_vafs = pd.merge(counts_liquid, vafs, on=['event_id'], how='inner') # only keep positions that are present in both
-
-    # simply return empty df if there are no common SNVs between liquid and tissue biopsies
-    if counts_liquid_and_vafs.empty:
-        return None
+    # join all liquid and clone vafs
+    counts_liquid_and_vafs = reduce(lambda left, right: pd.merge(left, right, on=['event_id'], how='inner'), counts_clones + [counts_liquid])
 
     # get corresponding clone CN values at SNV positions
     cn_row = 0

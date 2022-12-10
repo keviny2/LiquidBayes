@@ -21,12 +21,6 @@ import src.main
     help='Path to where the output is written to'
 )
 @click.option(
-    '-l', '--liquid-vcf',
-    type=click.STRING,
-    default='',
-    help='Path to liquid biopsy vcf file'
-)
-@click.option(
     '-b', '--clone-bams',
     type=click.STRING,
     default=[''],
@@ -34,11 +28,10 @@ import src.main
     multiple=True
 )
 @click.option(
-    '-v', '--clone-vcfs',
+    '-v', '--tissue-vcf',
     type=click.STRING,
     default=[''],
-    help='Path to clone vcf files (ex. ... -t path_to_clone_1 -t path_to_clone_2 -t path_to_clone_3 ...) - order of clones on the command line must be the same as copy-number profiles (--cn-profiles-path)',
-    multiple=True
+    help='Path to bulk tissue vcf file'
 )   
 @click.option(
     '--counts-mat',

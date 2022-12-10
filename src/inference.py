@@ -20,7 +20,7 @@ def run_inference(model,
 
     _print('Performing inference using {} model'.format(model), verbose)
     if model == 'base':
-        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
+        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(base),
                                          num_warmup=num_warmup,
                                          num_samples=num_samples,
                                          progress_bar=progress_bar)
@@ -28,7 +28,7 @@ def run_inference(model,
         return sampler_obj
 
     if model == 'extended':
-        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(eval(model.replace('-', '_')), target_accept_prob=target_accept_prob),  # convert '-' to '_' to match function name
+        sampler_obj = numpyro.infer.MCMC(numpyro.infer.NUTS(extended),
                                          num_warmup=num_warmup,
                                          num_samples=num_samples,
                                          progress_bar=progress_bar)

@@ -7,9 +7,8 @@ from src.utils import save_results, _print, get_extension, load_data, load_count
 def run(liquid_bam,
         cn_profiles_path,
         output,
-        liquid_vcf,
         clone_bams,
-        clone_vcfs,
+        tissue_vcf,
         counts_mat,
         model,
         num_samples,
@@ -35,17 +34,14 @@ def run(liquid_bam,
     # get counts at SNV locations if applicable
     if counts_mat is not None:
         counts = load_counts(counts_mat)
-    elif clone_bams == ('',) and clone_vcfs == ('',) or model == 'cn':
+    elif clone_bams == ('',) and tissue_vcf == ('',) or model == 'cn':
         counts = None
     else:
-        counts_liquid = get_counts(liquid_bam, liquid_vcf, verbose)
+        counts_liquid = get_counts(liquid_bam, tissue_vcf, verbose)
         counts_clones = []
-        for i in range(len(clone_vcfs)):
-            counts_clones.append(get_counts(clone_bams[i], clone_vcfs[i], verbose))
+        for i in range(len(clone_bams)):
+            counts_clones.append(get_counts(clone_bams[i], tissue_vcf, verbose))
         counts = process_counts(counts_liquid, counts_clones, cn_profiles, verbose)
-        # use base model if there are no common SNVs between liquid and tissue biopsies
-        if counts is None:
-            model = 'base'
 
     cn_profiles = cn_profiles[:, 3:].squeeze()  # first three columns are genomic bin information which we don't need for inference
     data = data.squeeze()
